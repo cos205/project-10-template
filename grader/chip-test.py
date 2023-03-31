@@ -47,6 +47,17 @@ def copy_upwards(folder, extension, correct=[]):
                 if f.lower() == c.lower() + extension and f != c + extension:
                     os.rename(os.path.join(folder, f), os.path.join(folder, c + extension))
 
+# Execute one test for project 10 (one iteration of the loop inside sotfware_project)
+def check_10(temp_dir, test, output, feedback):
+    for root, f in file_generator(os.path.join(temp_dir, test)):
+        if f.lower().endswith('.cmp'):
+            full_path = os.path.join(root, f)
+            if not os.path.exists(full_path[:-3] + 'xml'):
+                feedback.append(test, 'file_missing', output)
+                continue
+            if not compare_file(full_path, full_path[:-3] + 'xml'):
+                feedback.append(test, 'test_failed', f[:-3] + 'xml is different from ' + f)
+
 def software_project(temp_dir, project_num, t):
     # tests with only one file to translate
     one_file = ['Add', 'Max', 'MaxL', 'Rect', 'Pong'] +\
@@ -107,6 +118,10 @@ def software_project(temp_dir, project_num, t):
             output = program.run(filename + input_extension)
         else:
             output = program.run(dirname)
+
+        if project_num == 10:
+                 check_10(temp_dir, test, output, feedback)
+                 continue
         if os.path.exists(dirname + output_extension):
             shutil.move(dirname + output_extension, filename + output_extension)
             feedback.append(test, 'wrong_dir')
